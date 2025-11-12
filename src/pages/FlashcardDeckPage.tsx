@@ -1,32 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { flashcardDecks } from '../data/flashcards';
-import { ArrowLeft, ArrowRight, RefreshCw, RotateCw } from 'lucide-react';
+import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import FlashcardComponent from '../components/FlashcardComponent';
 import { useProgress } from '../context/ProgressContext';
+import { FlashcardDeck } from '../types';
+import { getFlashcardDeckById } from '../services/data';
 import confetti from 'canvas-confetti';
 
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { markFlashcardMastered } = useProgress();
-  
-  const [deck, setDeck] = useState(flashcardDecks.find(d => d.id === id));
+
+  const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [masteredCount, setMasteredCount] = useState(0);
-  
+
   useEffect(() => {
-    const foundDeck = flashcardDecks.find(d => d.id === id);
-    setDeck(foundDeck);
-    
-    // Reset current index when deck changes
-    setCurrentIndex(0);
-    
-    // Count mastered cards
-    if (foundDeck) {
-      const mastered = foundDeck.cards.filter(card => card.mastered).length;
-      setMasteredCount(mastered);
-    }
+    if (!id) return;
+    getFlashcardDeckById(id).then(d => {
+      setDeck(d);
+      setCurrentIndex(0);
+      if (d) {
+        const mastered = d.cards.filter(card => card.mastered).length;
+        setMasteredCount(mastered);
+      }
+    });
   }, [id]);
   
   if (!deck) {
