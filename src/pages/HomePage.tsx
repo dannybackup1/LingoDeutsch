@@ -1,12 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BookOpen, MessageSquare, Brain, CalendarCheck } from 'lucide-react';
-import { getDailyWord } from '../data/dailyWords';
 import DailyWordCard from '../components/DailyWordCard';
+import { DailyWord } from '../types';
+import { getDailyWord as fetchDailyWord } from '../services/data';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const dailyWord = getDailyWord();
+  const [dailyWord, setDailyWord] = useState<DailyWord | null>(null);
+
+  useEffect(() => {
+    fetchDailyWord().then(setDailyWord).catch(() => setDailyWord(null));
+  }, []);
 
   const features = [
     {
@@ -99,7 +104,7 @@ const HomePage: React.FC = () => {
           <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">
             Expand Your Vocabulary Daily
           </h2>
-          <DailyWordCard dailyWord={dailyWord} />
+          {dailyWord && <DailyWordCard dailyWord={dailyWord} />}
           <div className="text-center mt-8">
             <button 
               onClick={() => navigate('/daily-word')}
