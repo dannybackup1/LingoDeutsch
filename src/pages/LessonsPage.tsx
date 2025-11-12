@@ -1,12 +1,18 @@
-import React, { useState } from 'react';
-import { lessons } from '../data/lessons';
+import React, { useEffect, useState } from 'react';
 import LessonCard from '../components/LessonCard';
 import { Search, Filter } from 'lucide-react';
+import { Lesson } from '../types';
+import { listLessons } from '../services/data';
 
 const LessonsPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedLevel, setSelectedLevel] = useState<string>('');
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+
+  useEffect(() => {
+    listLessons().then(setLessons).catch(() => setLessons([]));
+  }, []);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
