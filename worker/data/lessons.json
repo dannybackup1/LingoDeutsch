@@ -1,0 +1,56 @@
+[
+  {
+    "id": "1",
+    "title": "Unit 1: Greetings and Introductions",
+    "category": "basics",
+    "level": "beginner",
+    "description": "Learn basic German greetings and how to introduce yourself.",
+    "content": "\n## Common German Greetings\n\n- **Hallo** - Hello\n- **Guten Morgen** - Good morning\n- **Guten Tag** - Good day\n- **Guten Abend** - Good evening\n- **Auf Wiedersehen** - Goodbye\n- **Tschüss** - Bye (informal)\n\n## Introducing Yourself\n\n- **Ich heiße [Name]** - My name is [Name]\n- **Ich bin [Name]** - I am [Name]\n- **Wie heißt du?** - What's your name? (informal)\n- **Wie heißen Sie?** - What's your name? (formal)\n- **Woher kommst du?** - Where are you from? (informal)\n- **Woher kommen Sie?** - Where are you from? (formal)\n- **Ich komme aus [Country]** - I come from [Country]\n\n## Practice Conversation\n\nA: Hallo! Wie heißt du?\nB: Hallo! Ich heiße Maria. Und du?\nA: Ich bin Thomas. Woher kommst du?\nB: Ich komme aus den USA. Und du?\nA: Ich komme aus Kanada. Nett, dich kennenzulernen!\nB: Nett, dich auch kennenzulernen!\n    ",
+    "imageUrl": "https://images.pexels.com/photos/3152045/pexels-photo-3152045.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "2",
+    "title": "Unit 2: Numbers 1-20",
+    "category": "basics",
+    "level": "beginner",
+    "description": "Learn to count from one to twenty in German.",
+    "content": "\n## German Numbers 1-20\n\n- 1 - eins\n- 2 - zwei\n- 3 - drei\n- 4 - vier\n- 5 - fünf\n- 6 - sechs\n- 7 - sieben\n- 8 - acht\n- 9 - neun\n- 10 - zehn\n- 11 - elf\n- 12 - zwölf\n- 13 - dreizehn\n- 14 - vierzehn\n- 15 - fünfzehn\n- 16 - sechzehn\n- 17 - siebzehn\n- 18 - achtzehn\n- 19 - neunzehn\n- 20 - zwanzig\n\n## Usage Tips\n\n- When giving your age: **Ich bin [number] Jahre alt** - I am [number] years old\n- When giving your phone number, Germans usually say each digit separately\n- When giving prices, use **Euro** after the number: **Das kostet fünf Euro** - That costs five euros\n    ",
+    "imageUrl": "https://images.pexels.com/photos/3184183/pexels-photo-3184183.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "3",
+    "title": "Unit 3: Present Tense Verbs",
+    "category": "grammar",
+    "level": "beginner",
+    "description": "Learn how to conjugate regular verbs in the present tense.",
+    "content": "\n## Regular Verb Conjugation in Present Tense\n\nIn German, verbs change their form depending on the subject. Here's the pattern for regular verbs:\n\n### Example with \"spielen\" (to play)\n\n- ich spiele - I play\n- du spielst - You play (informal singular)\n- er/sie/es spielt - He/she/it plays\n- wir spielen - We play\n- ihr spielt - You play (informal plural)\n- sie/Sie spielen - They/You play (formal)\n\n### Example with \"arbeiten\" (to work)\n\n- ich arbeite - I work\n- du arbeitest - You work (informal singular)\n- er/sie/es arbeitet - He/she/it works\n- wir arbeiten - We work\n- ihr arbeitet - You work (informal plural)\n- sie/Sie arbeiten - They/You work (formal)\n\n## Practice Exercises\n\n1. Conjugate \"lernen\" (to learn) for all persons\n2. Conjugate \"wohnen\" (to live) for all persons\n3. Create sentences with different subjects and the verb \"machen\" (to do/make)\n    ",
+    "imageUrl": "https://images.pexels.com/photos/267669/pexels-photo-267669.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "4",
+    "title": "Unit 4: Common Phrases for Travelers",
+    "category": "phrases",
+    "level": "beginner",
+    "description": "Essential German phrases for traveling in German-speaking countries.",
+    "content": "\n## Essential Travel Phrases\n\n### Basic Communication\n- **Entschuldigung** - Excuse me / Sorry\n- **Sprechen Sie Englisch?** - Do you speak English?\n- **Ich verstehe nicht** - I don't understand\n- **Können Sie das bitte wiederholen?** - Can you please repeat that?\n- **Wie bitte?** - Pardon? / Come again?\n\n### Finding Your Way\n- **Wo ist...?** - Where is...?\n- **Wie komme ich zu...?** - How do I get to...?\n- **Ist es weit?** - Is it far?\n- **rechts** - right\n- **links** - left\n- **geradeaus** - straight ahead\n\n### At Restaurants\n- **Ich möchte bestellen** - I would like to order\n- **Die Speisekarte, bitte** - The menu, please\n- **Die Rechnung, bitte** - The bill, please\n- **Prost!** - Cheers!\n- **Es war sehr lecker** - It was very delicious\n\n### Emergencies\n- **Hilfe!** - Help!\n- **Ich brauche einen Arzt** - I need a doctor\n- **Rufen Sie einen Krankenwagen!** - Call an ambulance!\n    ",
+    "imageUrl": "https://images.pexels.com/photos/2406731/pexels-photo-2406731.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "5",
+    "title": "Unit 5: Food Vocabulary",
+    "category": "vocabulary",
+    "level": "beginner",
+    "description": "Learn common German words for food and drinks.",
+    "content": "\n## Food Vocabulary\n\n### Meals\n- **das Frühstück** - breakfast\n- **das Mittagessen** - lunch\n- **das Abendessen** - dinner\n\n### Fruits\n- **der Apfel** - apple\n- **die Banane** - banana\n- **die Orange** - orange\n- **die Erdbeere** - strawberry\n- **die Weintraube** - grape\n\n### Vegetables\n- **die Kartoffel** - potato\n- **die Tomate** - tomato\n- **die Gurke** - cucumber\n- **der Salat** - lettuce/salad\n- **die Zwiebel** - onion\n\n### Meat & Fish\n- **das Fleisch** - meat\n- **das Huhn** - chicken\n- **das Rindfleisch** - beef\n- **das Schweinefleisch** - pork\n- **der Fisch** - fish\n\n### Drinks\n- **das Wasser** - water\n- **der Kaffee** - coffee\n- **der Tee** - tea\n- **der Saft** - juice\n- **das Bier** - beer\n- **der Wein** - wine\n\n### Common Phrases\n- **Ich habe Hunger** - I am hungry\n- **Ich habe Durst** - I am thirsty\n- **Guten Appetit!** - Enjoy your meal!\n    ",
+    "imageUrl": "https://images.pexels.com/photos/1640773/pexels-photo-1640773.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  },
+  {
+    "id": "6",
+    "title": "Unit 6: German Cases",
+    "category": "grammar",
+    "level": "intermediate",
+    "description": "Introduction to the four German cases and their usage.",
+    "content": "\n## The Four German Cases\n\nGerman has four cases that change the form of articles and adjectives:\n\n### 1. Nominative Case (Nominativ)\n- Used for the subject of a sentence\n- **Der** Mann ist groß. - **The** man is tall.\n- **Die** Frau ist nett. - **The** woman is nice.\n- **Das** Kind spielt. - **The** child plays.\n\n### 2. Accusative Case (Akkusativ)\n- Used for the direct object\n- Ich sehe **den** Mann. - I see **the** man.\n- Ich sehe **die** Frau. - I see **the** woman.\n- Ich sehe **das** Kind. - I see **the** child.\n\n### 3. Dative Case (Dativ)\n- Used for the indirect object\n- Ich gebe **dem** Mann ein Buch. - I give **the** man a book.\n- Ich gebe **der** Frau ein Buch. - I give **the** woman a book.\n- Ich gebe **dem** Kind ein Buch. - I give **the** child a book.\n\n### 4. Genitive Case (Genitiv)\n- Expresses possession\n- Das Buch **des** Mannes. - **The** man's book.\n- Das Buch **der** Frau. - **The** woman's book.\n- Das Buch **des** Kindes. - **The** child's book.\n\n## Case Table for Definite Articles\n\n|          | Masculine | Feminine | Neuter | Plural |\n|----------|-----------|----------|--------|--------|\n|Nominative| der       | die      | das    | die    |\n|Accusative| den       | die      | das    | die    |\n|Dative    | dem       | der      | dem    | den    |\n|Genitive  | des       | der      | des    | der    |\n    ",
+    "imageUrl": "https://images.pexels.com/photos/256431/pexels-photo-256431.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+  }
+]
