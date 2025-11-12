@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { lessons } from '../data/lessons';
+import { Lesson } from '../types';
+import { getLessonById, listLessons } from '../services/data';
 import { ArrowLeft, BookOpen, Check, Volume as VolumeUp } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 import ReactMarkdown from 'react-markdown';
@@ -9,19 +10,21 @@ const LessonDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { completedLessons, markLessonComplete } = useProgress();
-  const [lesson, setLesson] = useState(lessons.find(l => l.id === id));
+  const [lesson, setLesson] = useState<Lesson | undefined>(undefined);
+  const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
-    // Find the lesson
-    const foundLesson = lessons.find(l => l.id === id);
-    setLesson(foundLesson);
-    
-    // Check if lesson is completed
-    if (foundLesson) {
-      setIsCompleted(completedLessons.includes(foundLesson.id));
+    if (!id) return;
+    getLessonById(id).then(setLesson);
+    listLessons().then(setAllLessons);
+  }, [id]);
+
+  useEffect(() => {
+    if (lesson) {
+      setIsCompleted(completedLessons.includes(lesson.id));
     }
-  }, [id, completedLessons]);
+  }, [completedLessons, lesson]);
 
   const handleMarkComplete = () => {
     if (lesson) {
@@ -183,8 +186,8 @@ const LessonDetailPage: React.FC = () => {
         </div>
         
         <div className="flex justify-between">
-          {parseInt(lesson.id) > 1 && (
-            <button 
+          {lesson && parseInt(lesson.id) > 1 && (
+            <button
               onClick={() => navigate(`/lessons/${parseInt(lesson.id) - 1}`)}
               className="flex items-center text-gray-600 dark:text-gray-300 hover:text-primary 
                         dark:hover:text-accent transition-colors"
@@ -193,8 +196,8 @@ const LessonDetailPage: React.FC = () => {
               Previous Lesson
             </button>
           )}
-          {parseInt(lesson.id) < lessons.length && (
-            <button 
+          {lesson && parseInt(lesson.id) < allLessons.length && (
+            <button
               onClick={() => navigate(`/lessons/${parseInt(lesson.id) + 1}`)}
               className="flex items-center text-gray-600 dark:text-gray-300 hover:text-primary 
                         dark:hover:text-accent transition-colors ml-auto"
