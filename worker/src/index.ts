@@ -49,7 +49,15 @@ CREATE TABLE IF NOT EXISTS __migrations (
 
 async function bootstrap(env: Env) {
   const db = env.DB;
-  await db.exec(createTablesSQL);
+  // Run DDL statements individually to avoid compatibility issues with exec/meta.duration
+  const ddls = createTablesSQL
+    .split(';')
+    .map(s => s.trim())
+    .filter(Boolean)
+    .map(s => s + ';');
+  for (const sql of ddls) {
+    await db.prepare(sql).run();
+  }
 
   // Use a simple flag to avoid reseeding
   const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v1').first<{ value: string }>();
