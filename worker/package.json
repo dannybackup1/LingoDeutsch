@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "scripts": {
+    "build": "echo \"No build step required for Worker; wrangler will bundle TypeScript.\""
+  },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241112.0"
   }
