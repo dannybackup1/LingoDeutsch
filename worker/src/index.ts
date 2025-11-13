@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS __migrations (
 
 async function bootstrap(env: Env) {
   const db = env.DB;
-  // Run DDL statements individually to avoid compatibility issues with exec/meta.duration
+
   const ddls = createTablesSQL
     .split(';')
     .map(s => s.trim())
@@ -59,11 +59,9 @@ async function bootstrap(env: Env) {
     await db.prepare(sql).run();
   }
 
-  // Use a simple flag to avoid reseeding
   const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v1').first<{ value: string }>();
   if (seeded) return;
 
-  // Seed lessons
   const insertLesson = db.prepare(
     'INSERT OR IGNORE INTO lessons (id, title, category, level, description, content, imageUrl) VALUES (?, ?, ?, ?, ?, ?, ?)'
   );
@@ -71,7 +69,6 @@ async function bootstrap(env: Env) {
     await insertLesson.bind(l.id, l.title, l.category, l.level, l.description, l.content, l.imageUrl ?? null).run();
   }
 
-  // Seed decks and cards
   const insertDeck = db.prepare('INSERT OR IGNORE INTO flashcard_decks (id, title, category) VALUES (?, ?, ?)');
   const insertCard = db.prepare(
     'INSERT OR IGNORE INTO flashcards (id, deck_id, german, english, example, imageUrl, mastered) VALUES (?, ?, ?, ?, ?, ?, ?)'
@@ -83,7 +80,6 @@ async function bootstrap(env: Env) {
     }
   }
 
-  // Seed daily words
   const insertWord = db.prepare('INSERT OR IGNORE INTO daily_words (date, german, english, example) VALUES (?, ?, ?, ?)');
   for (const w of dailyWords as any[]) {
     await insertWord.bind(w.date, w.german, w.english, w.example).run();
@@ -92,19 +88,25 @@ async function bootstrap(env: Env) {
   await db.prepare('INSERT OR REPLACE INTO __migrations (key, value) VALUES (?, ?)').bind('seeded_v1', new Date().toISOString()).run();
 }
 
-function json(data: unknown, init?: ResponseInit) {
-  return new Response(JSON.stringify(data), {
-    headers: { 'content-type': 'application/json; charset=utf-8', ...(init?.headers || {}) },
-    status: init?.status || 200,
-  });
-}
-
+// ✅ CORS headers
 function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': '*', // 或者替换为你的前端域名
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
+}
+
+// ✅ JSON 响应统一带 CORS
+function json(data: unknown, init?: ResponseInit) {
+  return new Response(JSON.stringify(data), {
+    headers: {
+      'content-type': 'application/json; charset=utf-8',
+      ...corsHeaders(),
+      ...(init?.headers || {}),
+    },
+    status: init?.status || 200,
+  });
 }
 
 export default {
@@ -115,17 +117,18 @@ export default {
       const url = new URL(req.url);
       const path = url.pathname.replace(/\/$/, '');
 
+      // OPTIONS 预检请求
       if (req.method === 'OPTIONS') {
-          return new Response(null, {
-          headers: corsHeaders(),
-        });
+        return new Response(null, { headers: corsHeaders() });
       }
 
+      // GET /lessons
       if (req.method === 'GET' && path === '/lessons') {
         const { results } = await env.DB.prepare('SELECT * FROM lessons ORDER BY CAST(id AS INTEGER) ASC').all();
         return json(results);
       }
 
+      // GET /lessons/:id
       if (req.method === 'GET' && /^\/lessons\//.test(path)) {
         const id = decodeURIComponent(path.split('/')[2] || '');
         const row = await env.DB.prepare('SELECT * FROM lessons WHERE id = ?').bind(id).first();
@@ -133,17 +136,18 @@ export default {
         return json(row);
       }
 
+      // GET /flashcards
       if (req.method === 'GET' && path === '/flashcards') {
-        // Return decks with embedded cards
         const { results: deckRows } = await env.DB.prepare('SELECT * FROM flashcard_decks ORDER BY id').all();
-        const decks = [] as any[];
+        const decksList = [];
         for (const d of deckRows as any[]) {
           const { results: cards } = await env.DB.prepare('SELECT * FROM flashcards WHERE deck_id = ? ORDER BY id').bind(d.id).all();
-          decks.push({ ...d, cards });
+          decksList.push({ ...d, cards });
         }
-        return json(decks);
+        return json(decksList);
       }
 
+      // GET /flashcards/:id
       if (req.method === 'GET' && /^\/flashcards\//.test(path)) {
         const id = decodeURIComponent(path.split('/')[2] || '');
         const deck = await env.DB.prepare('SELECT * FROM flashcard_decks WHERE id = ?').bind(id).first<any>();
@@ -152,11 +156,13 @@ export default {
         return json({ ...deck, cards });
       }
 
+      // GET /daily-words
       if (req.method === 'GET' && path === '/daily-words') {
         const { results } = await env.DB.prepare('SELECT * FROM daily_words ORDER BY date ASC').all();
         return json(results);
       }
 
+      // GET /daily-word
       if (req.method === 'GET' && path === '/daily-word') {
         const { results } = await env.DB.prepare('SELECT * FROM daily_words').all();
         if (!results || results.length === 0) return json({ message: 'Not Found' }, { status: 404 });
@@ -164,7 +170,9 @@ export default {
         return json(results[idx]);
       }
 
-      return new Response('Not Found', { status: 404 });
+      // 404
+      return json({ message: 'Not Found' }, { status: 404 });
+
     } catch (e: any) {
       return json({ message: 'Internal Error', error: String(e?.message || e) }, { status: 500 });
     }
