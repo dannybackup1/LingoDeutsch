@@ -8,7 +8,7 @@ export const flashcardDecks: FlashcardDeck[] = [
     cards: [
       {
         id: 'card-1',
-        german: 'Hallo',
+        german: 'Hallo-debugmode',
         english: 'Hello',
         example: 'Hallo! Wie geht es dir?',
         mastered: false
