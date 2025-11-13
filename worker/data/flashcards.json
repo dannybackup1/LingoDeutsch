@@ -1,7 +1,7 @@
 [
   {
     "id": "basics-1",
-    "title": "Unit 1: Basic Greetings(worker data)",
+    "title": "Unit 1: Basic Greetings",
     "category": "basics",
     "cards": [
       {"id": "card-1", "german": "Hallo", "english": "Hello", "example": "Hallo! Wie geht es dir?", "mastered": false},
