@@ -101,7 +101,7 @@ function json(data: unknown, init?: ResponseInit) {
 
 function corsHeaders() {
   return {
-    'Access-Control-Allow-Origin': 'https://lingodeutsch.pages.dev',
+    'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   };
@@ -116,7 +116,7 @@ export default {
       const path = url.pathname.replace(/\/$/, '');
 
       if (req.method === 'OPTIONS') {
-        return new Response(null, {
+          return new Response(null, {
           headers: corsHeaders(),
         });
       }
