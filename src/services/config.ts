@@ -1,9 +1,14 @@
 export const isRemote = (): boolean => {
-  // If explicitly set to "local", force local demo data even in prod
-  const forceLocal = (import.meta as any)?.env?.VITE_FORCE_LOCAL === 'true';
-  if (forceLocal) return false;
-  // Use remote when building for production
-  return (import.meta as any)?.env?.PROD === true;
+  const demoMode = (import.meta as any)?.env?.VITE_DEMO_MODE;
+  switch (demoMode) {
+    case 'remote':
+      return true;
+    case 'local':
+      return false;
+    default:
+      console.warn('VITE_DEMO_MODE not set — defaulting to local mode');
+      return false;
+  }
 };
 
 export const getApiBase = (): string => {
