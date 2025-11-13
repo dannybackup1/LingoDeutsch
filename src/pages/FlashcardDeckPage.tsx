@@ -148,11 +148,7 @@ const FlashcardDeckPage: React.FC = () => {
               }`} />
               Previous
             </button>
-            
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Tap card to flip
-            </div>
-            
+                        
             <button
               onClick={goToNextCard}
               className="flex items-center px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 
