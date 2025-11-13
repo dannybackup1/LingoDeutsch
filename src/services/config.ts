@@ -1,4 +1,5 @@
 export const isRemote = (): boolean => {
+  console.log(import.meta.env.VITE_DEMO_MODE);
   const demoMode = (import.meta as any)?.env?.VITE_DEMO_MODE;
   switch (demoMode) {
     case 'remote':
