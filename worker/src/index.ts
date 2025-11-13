@@ -99,6 +99,14 @@ function json(data: unknown, init?: ResponseInit) {
   });
 }
 
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': 'https://lingodeutsch.pages.dev',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+}
+
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     try {
@@ -106,6 +114,12 @@ export default {
 
       const url = new URL(req.url);
       const path = url.pathname.replace(/\/$/, '');
+
+      if (req.method === 'OPTIONS') {
+        return new Response(null, {
+          headers: corsHeaders(),
+        });
+      }
 
       if (req.method === 'GET' && path === '/lessons') {
         const { results } = await env.DB.prepare('SELECT * FROM lessons ORDER BY CAST(id AS INTEGER) ASC').all();
