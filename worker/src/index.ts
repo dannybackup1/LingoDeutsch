@@ -101,11 +101,53 @@ function corsHeaders() {
   };
 }
 
-// ✅ JSON 响应统一带 CORS
-function json(data: unknown, init?: ResponseInit) {
-  return new Response(JSON.stringify(data), {
+// ✅ 生成 ETag (使用简单的哈希)
+function generateETag(data: string): string {
+  let hash = 0;
+  for (let i = 0; i < data.length; i++) {
+    const char = data.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // 转换为 32 位整数
+  }
+  return `"${Math.abs(hash).toString(16)}"`;
+}
+
+// ✅ 获取合理的 cache max-age（根据端点类型）
+function getCacheMaxAge(path: string): number {
+  if (path === '/daily-word') return 600; // 10 分钟，动态内容
+  if (path === '/daily-words') return 3600; // 1 小时
+  if (path.includes('/lessons') || path.includes('/flashcards')) return 86400; // 24 小时，静态内容
+  return 3600; // 默认 1 小时
+}
+
+// ✅ JSON 响应统一带 CORS 和 Cache-Control
+function json(data: unknown, req?: Request, path?: string, init?: ResponseInit) {
+  const dataStr = JSON.stringify(data);
+  const eTag = generateETag(dataStr);
+
+  const maxAge = path ? getCacheMaxAge(path) : 3600;
+  const cacheControl = `public, max-age=${maxAge}`;
+
+  // 检查 ETag 缓存验证 (304 Not Modified)
+  if (req) {
+    const ifNoneMatch = req.headers.get('if-none-match');
+    if (ifNoneMatch === eTag) {
+      return new Response(null, {
+        status: 304,
+        headers: {
+          'cache-control': cacheControl,
+          'etag': eTag,
+          ...corsHeaders(),
+        },
+      });
+    }
+  }
+
+  return new Response(dataStr, {
     headers: {
       'content-type': 'application/json; charset=utf-8',
+      'cache-control': cacheControl,
+      'etag': eTag,
       ...corsHeaders(),
       ...(init?.headers || {}),
     },
@@ -129,15 +171,15 @@ export default {
       // GET /lessons
       if (req.method === 'GET' && path === '/lessons') {
         const { results } = await env.DB.prepare('SELECT * FROM lessons ORDER BY CAST(id AS INTEGER) ASC').all();
-        return json(results);
+        return json(results, req, path);
       }
 
       // GET /lessons/:id
       if (req.method === 'GET' && /^\/lessons\//.test(path)) {
         const id = decodeURIComponent(path.split('/')[2] || '');
         const row = await env.DB.prepare('SELECT * FROM lessons WHERE id = ?').bind(id).first();
-        if (!row) return json({ message: 'Not Found' }, { status: 404 });
-        return json(row);
+        if (!row) return json({ message: 'Not Found' }, req, path, { status: 404 });
+        return json(row, req, path);
       }
 
       // GET /flashcards
@@ -148,37 +190,37 @@ export default {
           const { results: cards } = await env.DB.prepare('SELECT * FROM flashcards WHERE deck_id = ? ORDER BY id').bind(d.id).all();
           decksList.push({ ...d, cards });
         }
-        return json(decksList);
+        return json(decksList, req, path);
       }
 
       // GET /flashcards/:id
       if (req.method === 'GET' && /^\/flashcards\//.test(path)) {
         const id = decodeURIComponent(path.split('/')[2] || '');
         const deck = await env.DB.prepare('SELECT * FROM flashcard_decks WHERE id = ?').bind(id).first<any>();
-        if (!deck) return json({ message: 'Not Found' }, { status: 404 });
+        if (!deck) return json({ message: 'Not Found' }, req, path, { status: 404 });
         const { results: cards } = await env.DB.prepare('SELECT * FROM flashcards WHERE deck_id = ? ORDER BY id').bind(id).all();
-        return json({ ...deck, cards });
+        return json({ ...deck, cards }, req, path);
       }
 
       // GET /daily-words
       if (req.method === 'GET' && path === '/daily-words') {
         const { results } = await env.DB.prepare('SELECT * FROM daily_words ORDER BY date ASC').all();
-        return json(results);
+        return json(results, req, path);
       }
 
       // GET /daily-word
       if (req.method === 'GET' && path === '/daily-word') {
         const { results } = await env.DB.prepare('SELECT * FROM daily_words').all();
-        if (!results || results.length === 0) return json({ message: 'Not Found' }, { status: 404 });
+        if (!results || results.length === 0) return json({ message: 'Not Found' }, req, path, { status: 404 });
         const idx = Math.floor(Math.random() * results.length);
-        return json(results[idx]);
+        return json(results[idx], req, path);
       }
 
       // 404
-      return json({ message: 'Not Found' }, { status: 404 });
+      return json({ message: 'Not Found' }, req, path, { status: 404 });
 
     } catch (e: any) {
-      return json({ message: 'Internal Error', error: String(e?.message || e) }, { status: 500 });
+      return json({ message: 'Internal Error', error: String(e?.message || e) }, req, path, { status: 500 });
     }
   },
 };
