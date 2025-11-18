@@ -153,6 +153,75 @@ export default function RegisterPage() {
     }
   };
 
+  if (step === 'resend-verify') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Email Already Registered</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              This email is already registered. Would you like us to resend the verification code?
+            </p>
+
+            {error && (
+              <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-lg flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
+              </div>
+            )}
+
+            <form onSubmit={handleResendVerificationEmail} className="space-y-4">
+              <div>
+                <label htmlFor="email-resend" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <Mail className="w-4 h-4 inline mr-2" />
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email-resend"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="your.email@example.com"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+                  disabled={loading}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-lg transition flex items-center justify-center gap-2"
+              >
+                {loading ? 'Sending...' : 'Resend Verification Code'}
+                {!loading && <ArrowRight className="w-4 h-4" />}
+              </button>
+            </form>
+
+            <p className="text-center text-gray-600 dark:text-gray-400 mt-6">
+              <button
+                onClick={() => {
+                  setStep('register');
+                  setFormData({
+                    username: '',
+                    email: '',
+                    password: '',
+                    confirmPassword: '',
+                    verificationCode: '',
+                  });
+                  setError('');
+                }}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                Back to registration
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (step === 'register') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
