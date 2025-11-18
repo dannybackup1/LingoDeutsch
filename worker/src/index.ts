@@ -322,6 +322,260 @@ export default {
         return json(results[idx], req, path);
       }
 
+      // POST /auth/register
+      if (req.method === 'POST' && path === '/auth/register') {
+        const body = await req.json<{ username: string; email: string; password: string }>();
+        const { username, email, password } = body;
+
+        if (!username || !email || !password) {
+          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
+        }
+
+        // Check if user already exists
+        const existingUser = await env.DB.prepare(
+          'SELECT id FROM users WHERE email = ? OR username = ?'
+        ).bind(email, username).first();
+
+        if (existingUser) {
+          return json({ error: 'User already exists' }, req, path, { status: 409 });
+        }
+
+        const userId = generateId();
+        const passwordHash = await hashPassword(password);
+        const createdAt = new Date().toISOString();
+
+        await env.DB.prepare(
+          'INSERT INTO users (id, username, email, password_hash, email_verified, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)'
+        ).bind(userId, username, email, passwordHash, 0, createdAt, createdAt).run();
+
+        // Generate verification token and code
+        const verificationId = generateId();
+        const code = generateCode();
+        const token = generateToken();
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+        await env.DB.prepare(
+          'INSERT INTO email_verification_tokens (id, user_id, token, code, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+        ).bind(verificationId, userId, token, code, expiresAt, createdAt).run();
+
+        // Send verification email
+        const html = `
+          <h2>Welcome to LingoDeutsch!</h2>
+          <p>Your verification code is: <strong>${code}</strong></p>
+          <p>This code will expire in 24 hours.</p>
+          <p>Please enter this code on the verification page to complete your registration.</p>
+        `;
+
+        await sendEmail(email, 'Email Verification - LingoDeutsch', html, env);
+
+        return json(
+          {
+            success: true,
+            message: 'Registration successful. Please check your email for the verification code.',
+            userId,
+            requiresVerification: true,
+          },
+          req,
+          path
+        );
+      }
+
+      // POST /auth/verify-email
+      if (req.method === 'POST' && path === '/auth/verify-email') {
+        const body = await req.json<{ userId: string; code: string }>();
+        const { userId, code } = body;
+
+        if (!userId || !code) {
+          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
+        }
+
+        const verification = await env.DB.prepare(
+          'SELECT * FROM email_verification_tokens WHERE user_id = ? ORDER BY created_at DESC LIMIT 1'
+        ).bind(userId).first<any>();
+
+        if (!verification) {
+          return json({ error: 'No verification found' }, req, path, { status: 404 });
+        }
+
+        if (verification.code !== code) {
+          return json({ error: 'Invalid verification code' }, req, path, { status: 400 });
+        }
+
+        if (new Date(verification.expires_at) < new Date()) {
+          return json({ error: 'Verification code expired' }, req, path, { status: 400 });
+        }
+
+        const verifiedAt = new Date().toISOString();
+        await env.DB.prepare(
+          'UPDATE users SET email_verified = ?, verified_at = ?, updated_at = ? WHERE id = ?'
+        ).bind(1, verifiedAt, verifiedAt, userId).run();
+
+        // Delete used verification token
+        await env.DB.prepare('DELETE FROM email_verification_tokens WHERE id = ?').bind(verification.id).run();
+
+        // Get user for JWT
+        const user = await env.DB.prepare('SELECT id, username, email FROM users WHERE id = ?').bind(userId).first<any>();
+
+        return json(
+          {
+            success: true,
+            message: 'Email verified successfully',
+            user,
+          },
+          req,
+          path
+        );
+      }
+
+      // POST /auth/login
+      if (req.method === 'POST' && path === '/auth/login') {
+        const body = await req.json<{ email: string; password: string }>();
+        const { email, password } = body;
+
+        if (!email || !password) {
+          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
+        }
+
+        const user = await env.DB.prepare('SELECT * FROM users WHERE email = ?').bind(email).first<any>();
+
+        if (!user) {
+          return json({ error: 'User not found' }, req, path, { status: 404 });
+        }
+
+        if (!user.email_verified) {
+          return json(
+            { error: 'Email not verified', userId: user.id, requiresVerification: true },
+            req,
+            path,
+            { status: 403 }
+          );
+        }
+
+        const passwordValid = await verifyPassword(password, user.password_hash);
+
+        if (!passwordValid) {
+          return json({ error: 'Invalid password' }, req, path, { status: 401 });
+        }
+
+        // Update last login
+        await env.DB.prepare('UPDATE users SET updated_at = ? WHERE id = ?').bind(new Date().toISOString(), user.id).run();
+
+        return json(
+          {
+            success: true,
+            user: {
+              id: user.id,
+              username: user.username,
+              email: user.email,
+            },
+          },
+          req,
+          path
+        );
+      }
+
+      // POST /auth/forgot-password
+      if (req.method === 'POST' && path === '/auth/forgot-password') {
+        const body = await req.json<{ email: string }>();
+        const { email } = body;
+
+        if (!email) {
+          return json({ error: 'Email is required' }, req, path, { status: 400 });
+        }
+
+        const user = await env.DB.prepare('SELECT id, email FROM users WHERE email = ?').bind(email).first<any>();
+
+        if (!user) {
+          // Don't reveal if user exists
+          return json(
+            {
+              success: true,
+              message: 'If an account with that email exists, a password reset link will be sent.',
+            },
+            req,
+            path
+          );
+        }
+
+        // Generate reset token and code
+        const resetId = generateId();
+        const code = generateCode();
+        const token = generateToken();
+        const expiresAt = new Date(Date.now() + 1 * 60 * 60 * 1000).toISOString(); // 1 hour
+
+        await env.DB.prepare(
+          'INSERT INTO password_reset_tokens (id, user_id, token, code, expires_at, created_at) VALUES (?, ?, ?, ?, ?, ?)'
+        ).bind(resetId, user.id, token, code, expiresAt, new Date().toISOString()).run();
+
+        // Send password reset email
+        const html = `
+          <h2>Password Reset Request</h2>
+          <p>Your password reset code is: <strong>${code}</strong></p>
+          <p>This code will expire in 1 hour.</p>
+          <p>Please enter this code to reset your password.</p>
+        `;
+
+        await sendEmail(user.email, 'Password Reset - LingoDeutsch', html, env);
+
+        return json(
+          {
+            success: true,
+            message: 'If an account with that email exists, a password reset link will be sent.',
+          },
+          req,
+          path
+        );
+      }
+
+      // POST /auth/reset-password
+      if (req.method === 'POST' && path === '/auth/reset-password') {
+        const body = await req.json<{ email: string; code: string; newPassword: string }>();
+        const { email, code, newPassword } = body;
+
+        if (!email || !code || !newPassword) {
+          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
+        }
+
+        const user = await env.DB.prepare('SELECT id FROM users WHERE email = ?').bind(email).first<any>();
+
+        if (!user) {
+          return json({ error: 'User not found' }, req, path, { status: 404 });
+        }
+
+        const resetToken = await env.DB.prepare(
+          'SELECT * FROM password_reset_tokens WHERE user_id = ? AND code = ? ORDER BY created_at DESC LIMIT 1'
+        ).bind(user.id, code).first<any>();
+
+        if (!resetToken) {
+          return json({ error: 'Invalid reset code' }, req, path, { status: 400 });
+        }
+
+        if (new Date(resetToken.expires_at) < new Date()) {
+          return json({ error: 'Reset code expired' }, req, path, { status: 400 });
+        }
+
+        const newPasswordHash = await hashPassword(newPassword);
+        const now = new Date().toISOString();
+
+        await env.DB.prepare('UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?').bind(
+          newPasswordHash,
+          now,
+          user.id
+        ).run();
+
+        // Delete used reset token
+        await env.DB.prepare('DELETE FROM password_reset_tokens WHERE id = ?').bind(resetToken.id).run();
+
+        return json(
+          {
+            success: true,
+            message: 'Password reset successful',
+          },
+          req,
+          path
+        );
+      }
+
       // 404
       return json({ message: 'Not Found' }, req, path, { status: 404 });
 
