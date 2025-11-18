@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, User, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { getApiBase } from '../services/config';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -42,7 +43,8 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/auth/register', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -81,7 +83,8 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/auth/verify-email', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { getApiBase } from '../services/config';
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -26,7 +27,8 @@ export default function LoginPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/auth/login', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

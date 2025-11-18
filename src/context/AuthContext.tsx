@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { getApiBase } from '../services/config';
 
 export interface User {
   id: string;
@@ -43,7 +44,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/auth/login', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -71,7 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (username: string, email: string, password: string) => {
     try {
-      const response = await fetch('/auth/register', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
@@ -91,7 +94,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const verifyEmail = async (userId: string, code: string) => {
     try {
-      const response = await fetch('/auth/verify-email', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/verify-email`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, code }),
@@ -113,7 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const forgotPassword = async (email: string) => {
     try {
-      const response = await fetch('/auth/forgot-password', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -131,7 +136,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const resetPassword = async (email: string, code: string, newPassword: string) => {
     try {
-      const response = await fetch('/auth/reset-password', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, code, newPassword }),

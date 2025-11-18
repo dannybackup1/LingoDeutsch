@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
+import { getApiBase } from '../services/config';
 
 export default function PasswordRecoveryPage() {
   const navigate = useNavigate();
@@ -30,7 +31,8 @@ export default function PasswordRecoveryPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/auth/forgot-password', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/forgot-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -72,7 +74,8 @@ export default function PasswordRecoveryPage() {
 
     setLoading(true);
     try {
-      const response = await fetch('/auth/reset-password', {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/reset-password`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
