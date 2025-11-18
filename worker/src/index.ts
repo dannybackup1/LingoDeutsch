@@ -10,6 +10,10 @@ interface Env {
   SMTP_USER?: string;
   SMTP_PASS?: string;
   SMTP_FROM?: string;
+  SENDGRID_API_KEY?: string;
+  MAILGUN_API_KEY?: string;
+  MAILGUN_DOMAIN?: string;
+  RESEND_API_KEY?: string;
 }
 
 // Utility functions
