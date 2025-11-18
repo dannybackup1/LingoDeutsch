@@ -6,9 +6,3 @@ compatibility_date = "2025-11-13"
 binding = "DB"
 database_name = "lingo_deutsch_db"
 database_id = "c030e5bc-3c11-4ca3-9c2e-6db0d576f08d"
-
-[env.development]
-vars = { RESEND_API_KEY = "re_8gGgirPM_MbD8Peb1V4Ph2RPPNQEjcrRZ" }
-
-[env.production]
-vars = { RESEND_API_KEY = "re_8gGgirPM_MbD8Peb1V4Ph2RPPNQEjcrRZ" }
