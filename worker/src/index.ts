@@ -40,10 +40,11 @@ async function sendEmail(
   html: string,
   env: Env
 ): Promise<boolean> {
-  try {  
+  try {
 
     // Try Resend
     if (env.RESEND_API_KEY) {
+      console.log(`Attempting to send email to ${to} via Resend API`);
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -51,18 +52,25 @@ async function sendEmail(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: env.SMTP_FROM || 'LingoDeutsch <onboarding@resend.dev>',
+          from: 'LingoDeutsch <onboarding@resend.dev>',
           to,
           subject,
           html,
         }),
       });
-      return response.ok;
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error(`Resend API error (${response.status}): ${errorData}`);
+        return false;
+      }
+
+      console.log(`Email successfully sent to ${to}`);
+      return true;
     }
 
     // Fallback: console log if no email service configured
-    console.log(`Email not sent - no email service configured. Would send to ${to}: ${subject}`);
-    console.log('Configure one of: SENDGRID_API_KEY, MAILGUN_API_KEY, or RESEND_API_KEY');
+    console.log(`Email not sent - RESEND_API_KEY is not configured. Would send to ${to}: ${subject}`);
     return true; // Return true to not block registration
   } catch (error) {
     console.error('Email send error:', error);
