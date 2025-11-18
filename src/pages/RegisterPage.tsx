@@ -115,6 +115,44 @@ export default function RegisterPage() {
     }
   };
 
+  const handleResendVerificationEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!formData.email) {
+      setError('Please enter your email');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const apiBase = getApiBase();
+      const response = await fetch(`${apiBase}/auth/resend-verification-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Failed to resend verification email');
+        return;
+      }
+
+      if (data.userId) {
+        setUserId(data.userId);
+        setStep('verify');
+      }
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (step === 'register') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center px-4 py-12">
