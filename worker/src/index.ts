@@ -52,7 +52,7 @@ async function sendEmail(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'LingoDeutsch <onboarding@resend.dev>',
+          from: 'LingoDeutsch <danny@takeanything.store>',
           to,
           subject,
           html,
