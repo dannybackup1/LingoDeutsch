@@ -62,45 +62,7 @@ async function sendEmail(
   html: string,
   env: Env
 ): Promise<boolean> {
-  try {
-    // Try SendGrid first
-    if (env.SENDGRID_API_KEY) {
-      const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.SENDGRID_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          personalizations: [{ to: [{ email: to }] }],
-          from: { email: env.SMTP_FROM || 'noreply@lingodeutsch.com' },
-          subject,
-          content: [{ type: 'text/html', value: html }],
-        }),
-      });
-      return response.ok;
-    }
-
-    // Try Mailgun
-    if (env.MAILGUN_API_KEY && env.MAILGUN_DOMAIN) {
-      const formData = new FormData();
-      formData.append('from', env.SMTP_FROM || `LingoDeutsch <mailgun@${env.MAILGUN_DOMAIN}>`);
-      formData.append('to', to);
-      formData.append('subject', subject);
-      formData.append('html', html);
-
-      const response = await fetch(
-        `https://api.mailgun.net/v3/${env.MAILGUN_DOMAIN}/messages`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${btoa(`api:${env.MAILGUN_API_KEY}`)}`,
-          },
-          body: formData,
-        }
-      );
-      return response.ok;
-    }
+  try {  
 
     // Try Resend
     if (env.RESEND_API_KEY) {
