@@ -12,7 +12,7 @@ const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { markFlashcardMastered } = useProgress();
+  const { updateLastFlashcard } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
