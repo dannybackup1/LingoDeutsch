@@ -62,12 +62,12 @@ const FlashcardDeckPage: React.FC = () => {
   };
   
   const handleCardViewed = async (cardId: string) => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !id) {
       return;
     }
 
     try {
-      await updateLastFlashcard(cardId);
+      await updateLastFlashcard(cardId, id, currentIndex);
     } catch (error) {
       console.error('Failed to save progress:', error);
     }
