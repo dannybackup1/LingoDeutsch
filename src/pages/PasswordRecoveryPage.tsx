@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, Lock, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
-import { getApiBase } from '../services/config';
+import { useAuth } from '../context/AuthContext';
 
 export default function PasswordRecoveryPage() {
   const navigate = useNavigate();
