@@ -10,10 +10,10 @@ interface FlashcardProps {
 const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onViewed }) => {
   const [isFlipped, setIsFlipped] = useState(false);
 
-  // Notify parent when card is viewed
+  // Notify parent when card is viewed (only when card changes)
   useEffect(() => {
     onViewed(card.id);
-  }, [card.id, onViewed]);
+  }, [card.id]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
