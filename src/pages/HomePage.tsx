@@ -9,6 +9,8 @@ import { useProgress } from '../context/ProgressContext';
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { lastLessonId, lastFlashcardId } = useProgress();
   const [dailyWord, setDailyWord] = useState<DailyWord | null>(null);
 
   useEffect(() => {
