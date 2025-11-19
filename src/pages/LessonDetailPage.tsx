@@ -10,6 +10,7 @@ import ReactMarkdown from 'react-markdown';
 const LessonDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { completedLessons, markLessonComplete } = useProgress();
   const [lesson, setLesson] = useState<Lesson | undefined>(undefined);
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
