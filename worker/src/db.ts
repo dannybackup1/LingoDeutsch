@@ -72,6 +72,28 @@ CREATE TABLE IF NOT EXISTS password_reset_tokens (
   FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS user_lesson_progress (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  lesson_id TEXT NOT NULL,
+  completed_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(lesson_id) REFERENCES lessons(id) ON DELETE CASCADE,
+  UNIQUE(user_id, lesson_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_flashcard_progress (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL,
+  flashcard_id TEXT NOT NULL,
+  mastered_at TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
+  FOREIGN KEY(flashcard_id) REFERENCES flashcards(id) ON DELETE CASCADE,
+  UNIQUE(user_id, flashcard_id)
+);
+
 CREATE TABLE IF NOT EXISTS __migrations (
   key TEXT PRIMARY KEY,
   value TEXT
