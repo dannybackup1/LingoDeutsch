@@ -29,6 +29,12 @@ const LessonDetailPage: React.FC = () => {
   }, [completedLessons, lesson]);
 
   const handleMarkComplete = async () => {
+    if (!isAuthenticated) {
+      alert('Please log in to save your progress.');
+      navigate('/login');
+      return;
+    }
+
     if (lesson) {
       try {
         await markLessonComplete(lesson.id);
