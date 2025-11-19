@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import FlashcardComponent from '../components/FlashcardComponent';
 import { useProgress } from '../context/ProgressContext';
@@ -10,6 +10,7 @@ import { getFlashcardDeckById } from '../services/data';
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
   const { updateLastFlashcard } = useProgress();
 
@@ -20,9 +21,16 @@ const FlashcardDeckPage: React.FC = () => {
     if (!id) return;
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
-      setCurrentIndex(0);
+      // Read cardIndex from query params if available
+      const cardIndex = searchParams.get('cardIndex');
+      if (cardIndex !== null) {
+        const index = Math.max(0, Math.min(parseInt(cardIndex, 10), (d?.cards.length || 1) - 1));
+        setCurrentIndex(isNaN(index) ? 0 : index);
+      } else {
+        setCurrentIndex(0);
+      }
     });
-  }, [id]);
+  }, [id, searchParams]);
   
   if (!deck) {
     return (
@@ -62,12 +70,12 @@ const FlashcardDeckPage: React.FC = () => {
   };
   
   const handleCardViewed = async (cardId: string) => {
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !id) {
       return;
     }
 
     try {
-      await updateLastFlashcard(cardId);
+      await updateLastFlashcard(cardId, id, currentIndex);
     } catch (error) {
       console.error('Failed to save progress:', error);
     }
