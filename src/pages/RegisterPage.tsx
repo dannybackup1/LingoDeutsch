@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { register, verifyEmail } = useAuth();
   const [step, setStep] = useState<'register' | 'verify' | 'resend-verify'>('register');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
