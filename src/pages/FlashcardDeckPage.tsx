@@ -16,17 +16,12 @@ const FlashcardDeckPage: React.FC = () => {
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [masteredCount, setMasteredCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
       setCurrentIndex(0);
-      if (d) {
-        const mastered = d.cards.filter(card => card.mastered).length;
-        setMasteredCount(mastered);
-      }
     });
   }, [id]);
   
