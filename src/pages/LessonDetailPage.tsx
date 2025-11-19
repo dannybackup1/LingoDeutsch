@@ -26,10 +26,15 @@ const LessonDetailPage: React.FC = () => {
     }
   }, [completedLessons, lesson]);
 
-  const handleMarkComplete = () => {
+  const handleMarkComplete = async () => {
     if (lesson) {
-      markLessonComplete(lesson.id);
-      setIsCompleted(true);
+      try {
+        await markLessonComplete(lesson.id);
+        setIsCompleted(true);
+      } catch (error) {
+        console.error('Failed to mark lesson complete:', error);
+        alert('Failed to save progress. Please try again.');
+      }
     }
   };
 
