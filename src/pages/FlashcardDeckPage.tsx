@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import FlashcardComponent from '../components/FlashcardComponent';
 import { useProgress } from '../context/ProgressContext';
