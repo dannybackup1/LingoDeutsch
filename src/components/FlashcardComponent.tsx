@@ -49,21 +49,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onViewed }) => {
               <VolumeUp className="h-5 w-5 text-primary" />
             </button>
           </div>
-          <div className="absolute bottom-4 right-4">
-            <button
-              onClick={handleMarkMastered}
-              className={`p-2 rounded-full ${
-                isMastered 
-                  ? 'bg-success/20 hover:bg-success/30' 
-                  : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-              } transition-colors duration-200`}
-              aria-label={isMastered ? 'Mastered' : 'Mark as mastered'}
-            >
-              <CheckCircle className={`h-5 w-5 ${
-                isMastered ? 'text-success' : 'text-gray-400 dark:text-gray-500'
-              }`} />
-            </button>
-          </div>
           <div className="absolute top-4 right-4 text-xs text-gray-500 dark:text-gray-400">
             Click to flip
           </div>
