@@ -102,7 +102,7 @@ CREATE TABLE IF NOT EXISTS __migrations (
 
 export async function bootstrap(env: Env) {
   const db = env.DB;
-  const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v1').first<{ value: string }>();
+  const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v2').first<{ value: string }>();
   if (seeded) return;
   
   const ddls = createTablesSQL
