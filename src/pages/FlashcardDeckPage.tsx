@@ -65,25 +65,30 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleMarkMastered = (cardId: string) => {
-    markFlashcardMastered(cardId);
-    
-    // Update mastered count
-    setMasteredCount(masteredCount + 1);
-    
-    // Show confetti effect
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-    
-    // Optional: move to next card after a delay
-    setTimeout(() => {
-      if (currentIndex < deck.cards.length - 1) {
-        goToNextCard();
-      }
-    }, 1000);
+  const handleMarkMastered = async (cardId: string) => {
+    try {
+      await markFlashcardMastered(cardId);
+
+      // Update mastered count
+      setMasteredCount(masteredCount + 1);
+
+      // Show confetti effect
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+
+      // Optional: move to next card after a delay
+      setTimeout(() => {
+        if (currentIndex < deck.cards.length - 1) {
+          goToNextCard();
+        }
+      }, 1000);
+    } catch (error) {
+      console.error('Failed to mark flashcard mastered:', error);
+      alert('Failed to save progress. Please try again.');
+    }
   };
 
   const categoryColors = {
