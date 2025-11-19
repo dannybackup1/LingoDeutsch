@@ -68,6 +68,12 @@ const FlashcardDeckPage: React.FC = () => {
   };
   
   const handleMarkMastered = async (cardId: string) => {
+    if (!isAuthenticated) {
+      alert('Please log in to save your progress.');
+      navigate('/login');
+      return;
+    }
+
     try {
       await markFlashcardMastered(cardId);
 
