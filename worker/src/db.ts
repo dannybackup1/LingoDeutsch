@@ -137,5 +137,5 @@ export async function bootstrap(env: Env) {
     await insertWord.bind(w.date, w.german, w.english, w.example).run();
   }
 
-  await db.prepare('INSERT OR REPLACE INTO __migrations (key, value) VALUES (?, ?)').bind('seeded_v1', new Date().toISOString()).run();
+  await db.prepare('INSERT OR REPLACE INTO __migrations (key, value) VALUES (?, ?)').bind('seeded_v2', new Date().toISOString()).run();
 }
