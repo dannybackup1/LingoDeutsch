@@ -6,7 +6,6 @@ import { useProgress } from '../context/ProgressContext';
 import { useAuth } from '../context/AuthContext';
 import { FlashcardDeck } from '../types';
 import { getFlashcardDeckById } from '../services/data';
-import confetti from 'canvas-confetti';
 
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
