@@ -67,35 +67,15 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleMarkMastered = async (cardId: string) => {
+  const handleCardViewed = async (cardId: string) => {
     if (!isAuthenticated) {
-      alert('Please log in to save your progress.');
-      navigate('/login');
       return;
     }
 
     try {
-      await markFlashcardMastered(cardId);
-
-      // Update mastered count
-      setMasteredCount(masteredCount + 1);
-
-      // Show confetti effect
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 }
-      });
-
-      // Optional: move to next card after a delay
-      setTimeout(() => {
-        if (currentIndex < deck.cards.length - 1) {
-          goToNextCard();
-        }
-      }, 1000);
+      await updateLastFlashcard(cardId);
     } catch (error) {
-      console.error('Failed to mark flashcard mastered:', error);
-      alert('Failed to save progress. Please try again.');
+      console.error('Failed to save progress:', error);
     }
   };
 
