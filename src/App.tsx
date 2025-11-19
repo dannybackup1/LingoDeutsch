@@ -20,8 +20,8 @@ import PasswordRecoveryPage from './pages/PasswordRecoveryPage';
 function App() {
   return (
     <ThemeProvider>
-      <ProgressProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <ProgressProvider>
           <Router>
             <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
               <Navbar />
@@ -43,8 +43,8 @@ function App() {
               <Footer />
             </div>
           </Router>
-        </AuthProvider>
-      </ProgressProvider>
+        </ProgressProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

@@ -104,7 +104,7 @@ function getCacheMaxAge(path: string): number {
   if (path === '/daily-word') return 600; // 10 分钟，动态内容
   if (path === '/daily-words') return 3600; // 1 小时
   if (path.includes('/lessons') || path.includes('/flashcards')) return 86400; // 24 小时，静态内容
-  return 3600; // 默认 1 小时
+  return 3600; // 默认 1 小���
 }
 
 // ✅ JSON 响应统一带 CORS 和 Cache-Control
@@ -505,6 +505,85 @@ export default {
           {
             success: true,
             message: 'Password reset successful',
+          },
+          req,
+          path
+        );
+      }
+
+      // GET /progress/:userId
+      if (req.method === 'GET' && /^\/progress\/[^/]+$/.test(path)) {
+        const userId = decodeURIComponent(path.split('/')[2] || '');
+
+        if (!userId) {
+          return json({ error: 'User ID is required' }, req, path, { status: 400 });
+        }
+
+        const progress = await env.DB.prepare(
+          'SELECT last_lesson_id, last_flashcard_id FROM user_learning_progress WHERE user_id = ?'
+        ).bind(userId).first<any>();
+
+        return json(
+          {
+            userId,
+            lastLessonId: progress?.last_lesson_id || null,
+            lastFlashcardId: progress?.last_flashcard_id || null,
+          },
+          req,
+          path,
+          { headers: { 'cache-control': 'private, max-age=300' } }
+        );
+      }
+
+      // POST /progress/update-last-learning
+      if (req.method === 'POST' && path === '/progress/update-last-learning') {
+        const body = await req.json<{ userId: string; lessonId?: string; flashcardId?: string }>();
+        const { userId, lessonId, flashcardId } = body;
+
+        if (!userId) {
+          return json({ error: 'User ID is required' }, req, path, { status: 400 });
+        }
+
+        if (!lessonId && !flashcardId) {
+          return json({ error: 'At least one of lessonId or flashcardId is required' }, req, path, { status: 400 });
+        }
+
+        const now = new Date().toISOString();
+        const existing = await env.DB.prepare(
+          'SELECT user_id FROM user_learning_progress WHERE user_id = ?'
+        ).bind(userId).first<any>();
+
+        if (existing) {
+          const updates = [];
+          const bindings = [];
+
+          if (lessonId) {
+            updates.push('last_lesson_id = ?');
+            bindings.push(lessonId);
+          }
+          if (flashcardId) {
+            updates.push('last_flashcard_id = ?');
+            bindings.push(flashcardId);
+          }
+          updates.push('updated_at = ?');
+          bindings.push(now);
+          bindings.push(userId);
+
+          await env.DB.prepare(
+            `UPDATE user_learning_progress SET ${updates.join(', ')} WHERE user_id = ?`
+          ).bind(...bindings).run();
+        } else {
+          await env.DB.prepare(
+            'INSERT INTO user_learning_progress (user_id, last_lesson_id, last_flashcard_id, updated_at) VALUES (?, ?, ?, ?)'
+          ).bind(userId, lessonId || null, flashcardId || null, now).run();
+        }
+
+        return json(
+          {
+            success: true,
+            message: 'Learning progress updated',
+            lastLessonId: lessonId || null,
+            lastFlashcardId: flashcardId || null,
           },
           req,
           path

@@ -4,15 +4,16 @@ import { Lesson } from '../types';
 import { getLessonById, listLessons } from '../services/data';
 import { ArrowLeft, BookOpen, Check, Volume as VolumeUp } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
+import { useAuth } from '../context/AuthContext';
 import ReactMarkdown from 'react-markdown';
 
 const LessonDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { completedLessons, markLessonComplete } = useProgress();
+  const { isAuthenticated } = useAuth();
+  const { updateLastLesson } = useProgress();
   const [lesson, setLesson] = useState<Lesson | undefined>(undefined);
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
-  const [isCompleted, setIsCompleted] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -20,16 +21,21 @@ const LessonDetailPage: React.FC = () => {
     listLessons().then(setAllLessons);
   }, [id]);
 
-  useEffect(() => {
-    if (lesson) {
-      setIsCompleted(completedLessons.includes(lesson.id));
+  const handleMarkComplete = async () => {
+    if (!isAuthenticated) {
+      alert('Please log in to save your progress.');
+      navigate('/login');
+      return;
     }
-  }, [completedLessons, lesson]);
 
-  const handleMarkComplete = () => {
     if (lesson) {
-      markLessonComplete(lesson.id);
-      setIsCompleted(true);
+      try {
+        await updateLastLesson(lesson.id);
+        alert('Progress saved! You can continue from here next time.');
+      } catch (error) {
+        console.error('Failed to save progress:', error);
+        alert('Failed to save progress. Please try again.');
+      }
     }
   };
 
@@ -177,7 +183,7 @@ const LessonDetailPage: React.FC = () => {
                 ) : (
                   <>
                     <BookOpen className="h-5 w-5 mr-2" />
-                    Mark as Complete
+                    Save Progress
                   </>
                 )}
               </button>

@@ -3,28 +3,24 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import FlashcardComponent from '../components/FlashcardComponent';
 import { useProgress } from '../context/ProgressContext';
+import { useAuth } from '../context/AuthContext';
 import { FlashcardDeck } from '../types';
 import { getFlashcardDeckById } from '../services/data';
-import confetti from 'canvas-confetti';
 
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { markFlashcardMastered } = useProgress();
+  const { isAuthenticated } = useAuth();
+  const { updateLastFlashcard } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [masteredCount, setMasteredCount] = useState(0);
 
   useEffect(() => {
     if (!id) return;
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
       setCurrentIndex(0);
-      if (d) {
-        const mastered = d.cards.filter(card => card.mastered).length;
-        setMasteredCount(mastered);
-      }
     });
   }, [id]);
   
@@ -65,25 +61,16 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleMarkMastered = (cardId: string) => {
-    markFlashcardMastered(cardId);
-    
-    // Update mastered count
-    setMasteredCount(masteredCount + 1);
-    
-    // Show confetti effect
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 }
-    });
-    
-    // Optional: move to next card after a delay
-    setTimeout(() => {
-      if (currentIndex < deck.cards.length - 1) {
-        goToNextCard();
-      }
-    }, 1000);
+  const handleCardViewed = async (cardId: string) => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    try {
+      await updateLastFlashcard(cardId);
+    } catch (error) {
+      console.error('Failed to save progress:', error);
+    }
   };
 
   const categoryColors = {
@@ -115,7 +102,7 @@ const FlashcardDeckPage: React.FC = () => {
                 </span>
               </div>
               <p className="text-gray-600 dark:text-gray-300 text-sm">
-                Card {currentIndex + 1} of {deck.cards.length} • {masteredCount} mastered
+                Card {currentIndex + 1} of {deck.cards.length}
               </p>
             </div>
             
@@ -132,7 +119,7 @@ const FlashcardDeckPage: React.FC = () => {
           <div className="flex justify-center mb-8">
             <FlashcardComponent 
               card={currentCard}
-              onMastered={handleMarkMastered}
+              onViewed={handleCardViewed}
             />
           </div>
           

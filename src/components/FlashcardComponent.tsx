@@ -1,17 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Flashcard } from '../types';
-import { Volume as VolumeUp, CheckCircle } from 'lucide-react';
-import { useProgress } from '../context/ProgressContext';
+import { Volume as VolumeUp } from 'lucide-react';
 
 interface FlashcardProps {
   card: Flashcard;
-  onMastered: (cardId: string) => void;
+  onViewed: (cardId: string) => void;
 }
 
-const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onMastered }) => {
+const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onViewed }) => {
   const [isFlipped, setIsFlipped] = useState(false);
-  const { masteredFlashcards } = useProgress();
-  const isMastered = masteredFlashcards.includes(card.id);
+
+  // Notify parent when card is viewed (only when card changes)
+  useEffect(() => {
+    onViewed(card.id);
+  }, [card.id]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -23,11 +25,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onMastered }) => {
       utterance.lang = 'de-DE';
       window.speechSynthesis.speak(utterance);
     }
-  };
-
-  const handleMarkMastered = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent flipping the card
-    onMastered(card.id);
   };
 
   return (
@@ -50,21 +47,6 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onMastered }) => {
               aria-label="Pronounce"
             >
               <VolumeUp className="h-5 w-5 text-primary" />
-            </button>
-          </div>
-          <div className="absolute bottom-4 right-4">
-            <button
-              onClick={handleMarkMastered}
-              className={`p-2 rounded-full ${
-                isMastered 
-                  ? 'bg-success/20 hover:bg-success/30' 
-                  : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-              } transition-colors duration-200`}
-              aria-label={isMastered ? 'Mastered' : 'Mark as mastered'}
-            >
-              <CheckCircle className={`h-5 w-5 ${
-                isMastered ? 'text-success' : 'text-gray-400 dark:text-gray-500'
-              }`} />
             </button>
           </div>
           <div className="absolute top-4 right-4 text-xs text-gray-500 dark:text-gray-400">

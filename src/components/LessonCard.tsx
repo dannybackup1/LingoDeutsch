@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lesson } from '../types';
-import { BookOpen, Check } from 'lucide-react';
-import { useProgress } from '../context/ProgressContext';
+import { BookOpen } from 'lucide-react';
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -10,8 +9,6 @@ interface LessonCardProps {
 
 const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
   const navigate = useNavigate();
-  const { completedLessons } = useProgress();
-  const isCompleted = completedLessons.includes(lesson.id);
   
   const categoryColors = {
     basics: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
@@ -31,15 +28,10 @@ const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
   };
 
   return (
-    <div 
-      className="card hover:shadow-lg transform hover:scale-[1.02] transition-all cursor-pointer relative"
+    <div
+      className="card hover:shadow-lg transform hover:scale-[1.02] transition-all cursor-pointer"
       onClick={handleClick}
     >
-      {isCompleted && (
-        <div className="absolute top-2 right-2 bg-success/90 text-white p-1 rounded-full">
-          <Check className="h-4 w-4" />
-        </div>
-      )}
       
       {lesson.imageUrl && (
         <div className="h-36 rounded-t-xl bg-gray-200 dark:bg-gray-700 overflow-hidden">
