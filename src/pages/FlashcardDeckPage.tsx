@@ -125,7 +125,7 @@ const FlashcardDeckPage: React.FC = () => {
           <div className="flex justify-center mb-8">
             <FlashcardComponent 
               card={currentCard}
-              onMastered={handleMarkMastered}
+              onViewed={handleCardViewed}
             />
           </div>
           
