@@ -11,7 +11,7 @@ const LessonDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { updateLastLesson } = useProgress();
+  const { updateLastLesson, lastLessonId } = useProgress();
   const [lesson, setLesson] = useState<Lesson | undefined>(undefined);
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
 
@@ -58,7 +58,7 @@ const LessonDetailPage: React.FC = () => {
       if (matches) {
         matches.forEach(match => {
           const word = match.replace(/\*\*/g, '').replace(/-/g, '').trim();
-          if (/[äöüßa-z]/i.test(word)) { // Simple check for German characters
+          if (/[��öüßa-z]/i.test(word)) { // Simple check for German characters
             germanWords.push(word);
           }
         });
