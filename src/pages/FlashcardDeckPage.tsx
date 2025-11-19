@@ -11,6 +11,7 @@ import confetti from 'canvas-confetti';
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
   const { markFlashcardMastered } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
