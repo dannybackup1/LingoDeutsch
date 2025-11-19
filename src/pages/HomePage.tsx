@@ -56,19 +56,31 @@ const HomePage: React.FC = () => {
             Master the German language through interactive lessons, flashcards, and quizzes.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button 
-              onClick={() => navigate('/lessons')}
-              className="px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg 
+            <button
+              onClick={() => {
+                if (isAuthenticated && lastLessonId) {
+                  navigate(`/lessons/${lastLessonId}`);
+                } else {
+                  navigate('/lessons');
+                }
+              }}
+              className="px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg
                         hover:bg-gray-100 transition-colors duration-300"
             >
-              Start Learning
+              {isAuthenticated && lastLessonId ? 'Continue Lesson' : 'Start Learning'}
             </button>
-            <button 
-              onClick={() => navigate('/daily-word')}
-              className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold 
+            <button
+              onClick={() => {
+                if (isAuthenticated && lastFlashcardId) {
+                  navigate('/flashcards');
+                } else {
+                  navigate('/daily-word');
+                }
+              }}
+              className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold
                         rounded-lg hover:bg-white/10 transition-colors duration-300"
             >
-              Word of the Day
+              {isAuthenticated && lastFlashcardId ? 'Continue Flashcard' : 'Word of the Day'}
             </button>
           </div>
         </div>
