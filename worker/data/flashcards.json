@@ -74,13 +74,5 @@
       {"id": "card-68", "german": "Feuer machen", "english": "生火", "example": "Wir haben gelernt, wie man im Wald Feuer macht.", "mastered": false},
       {"id": "card-69", "german": "ab und zu", "english": "有时，偶尔", "example": "Ich gehe ab und zu ins Kino.", "mastered": false}
     ]
-  },
-  {
-    "id": "basics-2",
-    "title": "Unit 2: Common Questions",
-    "category": "basics",
-    "cards": [
-      {"id": "card-70", "german": "Wo wohnst du?", "english": "Where do you live? (informal)", "example": "Wo wohnst du? Ich wohne in Berlin.", "mastered": false}
-    ]
   }
 ]

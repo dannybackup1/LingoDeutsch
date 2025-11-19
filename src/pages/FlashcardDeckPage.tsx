@@ -165,7 +165,6 @@ const FlashcardDeckPage: React.FC = () => {
             <li>Say the words out loud to practice pronunciation</li>
             <li>Create your own example sentences with new vocabulary</li>
             <li>Try to recall the word before flipping the card</li>
-            <li>Mark cards as "mastered" once you consistently remember them</li>
           </ul>
         </div>
       </div>
