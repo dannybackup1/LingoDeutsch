@@ -32,23 +32,11 @@ export default function PasswordRecoveryPage() {
 
     setLoading(true);
     try {
-      const apiBase = getApiBase();
-      const response = await fetch(`${apiBase}/auth/forgot-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setError(data.error || 'Request failed');
-        return;
-      }
-
+      await forgotPassword(email);
       setStep('reset');
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
