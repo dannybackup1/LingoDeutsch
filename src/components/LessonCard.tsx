@@ -1,8 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lesson } from '../types';
-import { BookOpen, Check } from 'lucide-react';
-import { useProgress } from '../context/ProgressContext';
+import { BookOpen } from 'lucide-react';
 
 interface LessonCardProps {
   lesson: Lesson;
@@ -10,8 +9,6 @@ interface LessonCardProps {
 
 const LessonCard: React.FC<LessonCardProps> = ({ lesson }) => {
   const navigate = useNavigate();
-  const { completedLessons } = useProgress();
-  const isCompleted = completedLessons.includes(lesson.id);
   
   const categoryColors = {
     basics: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
