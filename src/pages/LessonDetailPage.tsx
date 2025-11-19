@@ -58,7 +58,7 @@ const LessonDetailPage: React.FC = () => {
       if (matches) {
         matches.forEach(match => {
           const word = match.replace(/\*\*/g, '').replace(/-/g, '').trim();
-          if (/[��öüßa-z]/i.test(word)) { // Simple check for German characters
+          if (/[äöüßa-z]/i.test(word)) { // Simple check for German characters
             germanWords.push(word);
           }
         });
@@ -98,6 +98,7 @@ const LessonDetailPage: React.FC = () => {
   };
 
   const germanWords = extractGermanWords(lesson.content);
+  const isCompleted = lastLessonId === lesson.id;
 
   return (
     <div className="min-h-screen py-12 px-6">
