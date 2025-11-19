@@ -44,35 +44,19 @@ export default function RegisterPage() {
 
     setLoading(true);
     try {
-      const apiBase = getApiBase();
-      const response = await fetch(`${apiBase}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 409 && data.error === 'User already exists') {
-          setError('');
-          setStep('resend-verify');
-          return;
-        }
-        setError(data.error || 'Registration failed');
-        return;
-      }
-
-      if (data.userId) {
-        setUserId(data.userId);
+      const result = await register(formData.username, formData.email, formData.password);
+      if (result.userId) {
+        setUserId(result.userId);
         setStep('verify');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.';
+      if (errorMessage.includes('already exists')) {
+        setError('');
+        setStep('resend-verify');
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }
