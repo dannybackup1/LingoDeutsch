@@ -71,7 +71,9 @@ const HomePage: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                if (isAuthenticated && lastFlashcardId) {
+                if (isAuthenticated && lastFlashcardDeckId && lastFlashcardIndex !== null) {
+                  navigate(`/flashcards/${lastFlashcardDeckId}?cardIndex=${lastFlashcardIndex}`);
+                } else if (isAuthenticated && lastFlashcardId) {
                   navigate('/flashcards');
                 } else {
                   navigate('/daily-word');
