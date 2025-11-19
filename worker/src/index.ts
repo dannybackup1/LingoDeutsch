@@ -104,7 +104,7 @@ function getCacheMaxAge(path: string): number {
   if (path === '/daily-word') return 600; // 10 分钟，动态内容
   if (path === '/daily-words') return 3600; // 1 小时
   if (path.includes('/lessons') || path.includes('/flashcards')) return 86400; // 24 小时，静态内容
-  return 3600; // 默认 1 小时
+  return 3600; // 默认 1 小���
 }
 
 // ✅ JSON 响应统一带 CORS 和 Cache-Control
@@ -519,22 +519,15 @@ export default {
           return json({ error: 'User ID is required' }, req, path, { status: 400 });
         }
 
-        const { results: lessonResults } = await env.DB.prepare(
-          'SELECT lesson_id FROM user_lesson_progress WHERE user_id = ? ORDER BY completed_at DESC'
-        ).bind(userId).all();
-
-        const { results: flashcardResults } = await env.DB.prepare(
-          'SELECT flashcard_id FROM user_flashcard_progress WHERE user_id = ? ORDER BY mastered_at DESC'
-        ).bind(userId).all();
-
-        const completedLessons = (lessonResults as any[] || []).map(r => r.lesson_id);
-        const masteredFlashcards = (flashcardResults as any[] || []).map(r => r.flashcard_id);
+        const progress = await env.DB.prepare(
+          'SELECT last_lesson_id, last_flashcard_id FROM user_learning_progress WHERE user_id = ?'
+        ).bind(userId).first<any>();
 
         return json(
           {
             userId,
-            completedLessons,
-            masteredFlashcards,
+            lastLessonId: progress?.last_lesson_id || null,
+            lastFlashcardId: progress?.last_flashcard_id || null,
           },
           req,
           path,
@@ -542,88 +535,59 @@ export default {
         );
       }
 
-      // POST /progress/lesson-complete
-      if (req.method === 'POST' && path === '/progress/lesson-complete') {
-        const body = await req.json<{ userId: string; lessonId: string }>();
-        const { userId, lessonId } = body;
+      // POST /progress/update-last-learning
+      if (req.method === 'POST' && path === '/progress/update-last-learning') {
+        const body = await req.json<{ userId: string; lessonId?: string; flashcardId?: string }>();
+        const { userId, lessonId, flashcardId } = body;
 
-        if (!userId || !lessonId) {
-          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
+        if (!userId) {
+          return json({ error: 'User ID is required' }, req, path, { status: 400 });
+        }
+
+        if (!lessonId && !flashcardId) {
+          return json({ error: 'At least one of lessonId or flashcardId is required' }, req, path, { status: 400 });
         }
 
         const now = new Date().toISOString();
-        const progressId = generateId();
+        const existing = await env.DB.prepare(
+          'SELECT user_id FROM user_learning_progress WHERE user_id = ?'
+        ).bind(userId).first<any>();
 
-        try {
-          await env.DB.prepare(
-            'INSERT INTO user_lesson_progress (id, user_id, lesson_id, completed_at, created_at) VALUES (?, ?, ?, ?, ?)'
-          ).bind(progressId, userId, lessonId, now, now).run();
+        if (existing) {
+          const updates = [];
+          const bindings = [];
 
-          return json(
-            {
-              success: true,
-              message: 'Lesson marked as complete',
-              lessonId,
-            },
-            req,
-            path
-          );
-        } catch (error: any) {
-          if (error.message?.includes('UNIQUE')) {
-            return json(
-              {
-                success: true,
-                message: 'Lesson already marked as complete',
-                lessonId,
-              },
-              req,
-              path
-            );
+          if (lessonId) {
+            updates.push('last_lesson_id = ?');
+            bindings.push(lessonId);
           }
-          throw error;
-        }
-      }
-
-      // POST /progress/flashcard-master
-      if (req.method === 'POST' && path === '/progress/flashcard-master') {
-        const body = await req.json<{ userId: string; flashcardId: string }>();
-        const { userId, flashcardId } = body;
-
-        if (!userId || !flashcardId) {
-          return json({ error: 'Missing required fields' }, req, path, { status: 400 });
-        }
-
-        const now = new Date().toISOString();
-        const progressId = generateId();
-
-        try {
-          await env.DB.prepare(
-            'INSERT INTO user_flashcard_progress (id, user_id, flashcard_id, mastered_at, created_at) VALUES (?, ?, ?, ?, ?)'
-          ).bind(progressId, userId, flashcardId, now, now).run();
-
-          return json(
-            {
-              success: true,
-              message: 'Flashcard marked as mastered',
-              flashcardId,
-            },
-            req,
-            path
-          );
-        } catch (error: any) {
-          if (error.message?.includes('UNIQUE')) {
-            return json(
-              {
-                success: true,
-                message: 'Flashcard already marked as mastered',
-                flashcardId,
-              },
-              req,
-              path
-            );
+          if (flashcardId) {
+            updates.push('last_flashcard_id = ?');
+            bindings.push(flashcardId);
           }
-          throw error;
+          updates.push('updated_at = ?');
+          bindings.push(now);
+          bindings.push(userId);
+
+          await env.DB.prepare(
+            `UPDATE user_learning_progress SET ${updates.join(', ')} WHERE user_id = ?`
+          ).bind(...bindings).run();
+        } else {
+          await env.DB.prepare(
+            'INSERT INTO user_learning_progress (user_id, last_lesson_id, last_flashcard_id, updated_at) VALUES (?, ?, ?, ?)'
+          ).bind(userId, lessonId || null, flashcardId || null, now).run();
         }
+
+        return json(
+          {
+            success: true,
+            message: 'Learning progress updated',
+            lastLessonId: lessonId || null,
+            lastFlashcardId: flashcardId || null,
+          },
+          req,
+          path
+        );
       }
 
       // 404
