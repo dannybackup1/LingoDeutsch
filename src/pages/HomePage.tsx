@@ -80,10 +80,10 @@ const HomePage: React.FC = () => {
                   navigate('/lessons');
                 }
               }}
-              className="min-w-48 px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg
+              className="w-48 px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg
                         hover:bg-gray-100 transition-colors duration-300"
             >
-              {isAuthenticated && lastLessonId ? 'Continue Lesson' : 'Start Lesson'}
+              {isAuthenticated && lastLessonId ? 'Cont. Lesson' : 'Start Lesson'}
             </button>
             <button
               onClick={() => {
@@ -93,10 +93,10 @@ const HomePage: React.FC = () => {
                   navigate('/flashcards');
                 }
               }}
-              className="min-w-48 px-8 py-3 bg-transparent border-2 border-white text-white font-semibold
+              className="w-48 px-8 py-3 bg-transparent border-2 border-white text-white font-semibold
                         rounded-lg hover:bg-white/10 transition-colors duration-300"
             >
-              {isAuthenticated && lastFlashcardId ? 'Continue Flashcard' : 'Start Flashcard'}
+              {isAuthenticated && lastFlashcardId ? 'Cont. Flashcard' : 'Start Flashcard'}
             </button>
           </div>
         </div>
