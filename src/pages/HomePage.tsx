@@ -83,7 +83,7 @@ const HomePage: React.FC = () => {
               className="w-52 px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg
                         hover:bg-gray-100 transition-colors duration-300"
             >
-              {isAuthenticated && lastLessonId ? 'Continue Lesson' : 'Start Lesson'}
+              {isAuthenticated && lastLessonId ? 'Continue  Lesson' : 'Start  Lesson'}
             </button>
             <button
               onClick={() => {
