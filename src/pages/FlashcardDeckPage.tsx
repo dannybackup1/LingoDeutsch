@@ -87,13 +87,14 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleCardViewed = async (cardId: string) => {
-    if (!isAuthenticated || !id) {
+  const handleCardViewed = async () => {
+    if (!isAuthenticated || !id || !currentCard) {
       return;
     }
 
     try {
-      await updateLastFlashcard(cardId, id, currentIndex);
+      // Pass the card ID from the current card
+      await updateLastFlashcard(currentCard.id, id, currentIndex);
     } catch (error) {
       console.error('Failed to save progress:', error);
     }
