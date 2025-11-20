@@ -27,28 +27,28 @@ const FlashcardDeckPage: React.FC = () => {
 
   useEffect(() => {
     if (!id) return;
+
+    // Load deck once when id changes
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
-
-      // If user has progress in this deck, resume from last card
-      if (lastFlashcardId && lastFlashcardDeckId === id) {
-        const parsed = parseFlashcardId(lastFlashcardId);
-        if (parsed) {
-          // Find the card with matching ID
-          const cardIndex = d?.cards.findIndex(card => card.id === parsed.cardId) ?? -1;
-          if (cardIndex !== -1) {
-            setCurrentIndex(cardIndex);
-          } else {
-            setCurrentIndex(0);
-          }
-        } else {
-          setCurrentIndex(0);
-        }
-      } else {
-        setCurrentIndex(0);
-      }
+      // Reset to first card when loading a new deck
+      setCurrentIndex(0);
     });
-  }, [id, lastFlashcardId, lastFlashcardDeckId]);
+  }, [id]);
+
+  // Separately handle resuming from last position on initial mount
+  useEffect(() => {
+    if (!deck || !lastFlashcardId || lastFlashcardDeckId !== id) return;
+
+    const parsed = parseFlashcardId(lastFlashcardId);
+    if (parsed && parsed.deckId === id) {
+      // Find the card with matching ID
+      const cardIndex = deck.cards.findIndex(card => card.id === parsed.cardId);
+      if (cardIndex !== -1) {
+        setCurrentIndex(cardIndex);
+      }
+    }
+  }, [deck, id]);
   
   if (!deck) {
     return (
