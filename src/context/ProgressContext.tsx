@@ -14,16 +14,6 @@ interface ProgressContextType {
 
 const ProgressContext = createContext<ProgressContextType | undefined>(undefined);
 
-// Helper function to parse flashcardId format "deckId-cardId"
-// Example: "1-0001" -> { deckId: "1", cardId: "0001" }
-function parseFlashcardId(flashcardId: string) {
-  const parts = flashcardId.split('-');
-  if (parts.length === 2) {
-    return { deckId: parts[0], cardId: parts[1] };
-  }
-  return null;
-}
-
 export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [lastLessonId, setLastLessonId] = useState<string | null>(null);
@@ -31,23 +21,10 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [isLoading, setIsLoading] = useState(false);
   const progressLoadedRef = useRef<string | null>(null);
 
-  // Parse lastFlashcardId to extract deckId and cardIndex
-  // This is computed from the flashcardId format "deckId-cardId"
-  const { lastFlashcardDeckId, lastFlashcardIndex } = useMemo(() => {
-    if (!lastFlashcardId) {
-      return { lastFlashcardDeckId: null, lastFlashcardIndex: null };
-    }
-
-    const parsed = parseFlashcardId(lastFlashcardId);
-    if (!parsed) {
-      return { lastFlashcardDeckId: null, lastFlashcardIndex: null };
-    }
-
-    // For backward compatibility: if lastFlashcardId is in format "deckId-cardId"
-    // we treat it as if the user was at that card, but we don't know the exact index
-    // The actual cardIndex will need to be derived from the cards array in FlashcardDeckPage
-    return { lastFlashcardDeckId: parsed.deckId, lastFlashcardIndex: 0 };
-  }, [lastFlashcardId]);
+  // For backward compatibility with the old context interface
+  // We don't actually use these, but they're part of the exported context type
+  const lastFlashcardDeckId = null;
+  const lastFlashcardIndex = null;
 
   // Load progress from backend when user changes
   useEffect(() => {
