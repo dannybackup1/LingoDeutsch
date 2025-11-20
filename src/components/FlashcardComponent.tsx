@@ -4,7 +4,7 @@ import { Volume as VolumeUp } from 'lucide-react';
 
 interface FlashcardProps {
   card: Flashcard;
-  onViewed: (cardId: string) => void;
+  onViewed: () => void;
 }
 
 const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onViewed }) => {
@@ -12,8 +12,8 @@ const FlashcardComponent: React.FC<FlashcardProps> = ({ card, onViewed }) => {
 
   // Notify parent when card is viewed (only when card changes)
   useEffect(() => {
-    onViewed(card.id);
-  }, [card.id]);
+    onViewed();
+  }, [card.id, onViewed]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);

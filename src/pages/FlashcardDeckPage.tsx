@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, RefreshCw } from 'lucide-react';
 import FlashcardComponent from '../components/FlashcardComponent';
 import { useProgress } from '../context/ProgressContext';
@@ -10,27 +10,33 @@ import { getFlashcardDeckById } from '../services/data';
 const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
-  const { updateLastFlashcard } = useProgress();
+  const { updateLastFlashcard, lastFlashcardId } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (!id) return;
+
+    // Load deck once when id changes
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
-      // Read cardIndex from query params if available
-      const cardIndex = searchParams.get('cardIndex');
-      if (cardIndex !== null) {
-        const index = Math.max(0, Math.min(parseInt(cardIndex, 10), (d?.cards.length || 1) - 1));
-        setCurrentIndex(isNaN(index) ? 0 : index);
-      } else {
-        setCurrentIndex(0);
-      }
+      // Reset to first card when loading a new deck
+      setCurrentIndex(0);
     });
-  }, [id, searchParams]);
+  }, [id]);
+
+  // Separately handle resuming from last position on initial mount
+  useEffect(() => {
+    if (!deck || !lastFlashcardId) return;
+
+    // Find the card with matching ID directly (lastFlashcardId is the card ID, e.g., "1-0022")
+    const cardIndex = deck.cards.findIndex(card => card.id === lastFlashcardId);
+    if (cardIndex !== -1) {
+      setCurrentIndex(cardIndex);
+    }
+  }, [deck]);
   
   if (!deck) {
     return (
@@ -69,13 +75,14 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleCardViewed = async (cardId: string) => {
-    if (!isAuthenticated || !id) {
+  const handleCardViewed = async () => {
+    if (!isAuthenticated || !id || !currentCard) {
       return;
     }
 
     try {
-      await updateLastFlashcard(cardId, id, currentIndex);
+      // Pass the card ID from the current card
+      await updateLastFlashcard(currentCard.id, id, currentIndex);
     } catch (error) {
       console.error('Failed to save progress:', error);
     }
