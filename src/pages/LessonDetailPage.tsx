@@ -11,7 +11,7 @@ const LessonDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { updateLastLesson } = useProgress();
+  const { updateLastLesson, lastLessonId } = useProgress();
   const [lesson, setLesson] = useState<Lesson | undefined>(undefined);
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
 
@@ -31,10 +31,8 @@ const LessonDetailPage: React.FC = () => {
     if (lesson) {
       try {
         await updateLastLesson(lesson.id);
-        alert('Progress saved! You can continue from here next time.');
       } catch (error) {
         console.error('Failed to save progress:', error);
-        alert('Failed to save progress. Please try again.');
       }
     }
   };
@@ -98,6 +96,7 @@ const LessonDetailPage: React.FC = () => {
   };
 
   const germanWords = extractGermanWords(lesson.content);
+  const isCompleted = lastLessonId === lesson.id;
 
   return (
     <div className="min-h-screen py-12 px-6">

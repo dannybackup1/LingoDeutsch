@@ -13,6 +13,22 @@ const HomePage: React.FC = () => {
   const { lastLessonId, lastFlashcardId } = useProgress();
   const [dailyWord, setDailyWord] = useState<DailyWord | null>(null);
 
+  // Extract deck ID from card ID (e.g., "1-0022" -> "basics-1")
+  // Card IDs have format "deckNumber-cardNumber", we map back to "category-deckNumber"
+  const getLastDeckId = () => {
+    if (!lastFlashcardId) return null;
+    const cardIdParts = lastFlashcardId.split('-');
+    if (cardIdParts.length >= 2) {
+      const deckNumber = cardIdParts[0];
+      // For now, we assume all cards are in "basics" category decks
+      // In the future, this could be enhanced to look up the actual category
+      return `basics-${deckNumber}`;
+    }
+    return null;
+  };
+
+  const lastDeckId = getLastDeckId();
+
   useEffect(() => {
     fetchDailyWord().then(setDailyWord).catch(() => setDailyWord(null));
   }, []);
@@ -56,76 +72,36 @@ const HomePage: React.FC = () => {
             Master the German language through interactive lessons, flashcards, and quizzes.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button 
-              onClick={() => navigate('/lessons')}
-              className="px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg 
+            <button
+              onClick={() => {
+                if (isAuthenticated && lastLessonId) {
+                  navigate(`/lessons/${lastLessonId}`);
+                } else {
+                  navigate('/lessons');
+                }
+              }}
+              className="min-w-48 px-8 py-3 bg-white text-primary font-semibold rounded-lg shadow-lg
                         hover:bg-gray-100 transition-colors duration-300"
             >
-              Start Learning
+              {isAuthenticated && lastLessonId ? 'Continue Lesson' : 'Start Lesson'}
             </button>
-            <button 
-              onClick={() => navigate('/daily-word')}
-              className="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold 
+            <button
+              onClick={() => {
+                if (isAuthenticated && lastDeckId) {
+                  navigate(`/flashcards/${lastDeckId}`);
+                } else {
+                  navigate('/flashcards');
+                }
+              }}
+              className="min-w-48 px-8 py-3 bg-transparent border-2 border-white text-white font-semibold
                         rounded-lg hover:bg-white/10 transition-colors duration-300"
             >
-              Word of the Day
+              {isAuthenticated && lastFlashcardId ? 'Continue Flashcard' : 'Start Flashcard'}
             </button>
           </div>
         </div>
       </section>
 
-      {/* Continue Learning Section */}
-      {isAuthenticated && (lastLessonId || lastFlashcardId) && (
-        <section className="py-12 px-6 bg-accent/10 dark:bg-accent/5 border-b border-accent/20">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Continue Learning</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {lastLessonId && (
-                <button
-                  onClick={() => navigate(`/lessons/${lastLessonId}`)}
-                  className="text-left p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg
-                           hover:scale-[1.02] transition-all duration-300 border-l-4 border-primary"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
-                        Continue Your Last Lesson
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        Pick up where you left off
-                      </p>
-                    </div>
-                    <ArrowRight className="h-6 w-6 text-primary flex-shrink-0 ml-4" />
-                  </div>
-                </button>
-              )}
-              {lastFlashcardId && (
-                <button
-                  onClick={() => {
-                    // Get the deck ID from the flashcard - for now navigate to all flashcards
-                    // The user can select the same deck they were studying
-                    navigate('/flashcards');
-                  }}
-                  className="text-left p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg
-                           hover:scale-[1.02] transition-all duration-300 border-l-4 border-secondary"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="font-bold text-lg text-gray-900 dark:text-white mb-2">
-                        Continue Your Flashcards
-                      </h3>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm">
-                        Keep practicing your cards
-                      </p>
-                    </div>
-                    <ArrowRight className="h-6 w-6 text-secondary flex-shrink-0 ml-4" />
-                  </div>
-                </button>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
 
       {/* Features Section */}
       <section className="py-16 px-6 bg-white dark:bg-gray-900">

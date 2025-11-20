@@ -107,8 +107,7 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Failed to resend verification email');
-        return;
+        throw new Error(data.error || 'Failed to resend verification email');
       }
 
       if (data.userId) {
@@ -116,7 +115,8 @@ export default function RegisterPage() {
         setStep('verify');
       }
     } catch (err) {
-      setError('An error occurred. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }

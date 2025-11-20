@@ -11,18 +11,32 @@ const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { updateLastFlashcard } = useProgress();
+  const { updateLastFlashcard, lastFlashcardId } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     if (!id) return;
+
+    // Load deck once when id changes
     getFlashcardDeckById(id).then(d => {
       setDeck(d);
+      // Reset to first card when loading a new deck
       setCurrentIndex(0);
     });
   }, [id]);
+
+  // Separately handle resuming from last position on initial mount
+  useEffect(() => {
+    if (!deck || !lastFlashcardId) return;
+
+    // Find the card with matching ID directly (lastFlashcardId is the card ID, e.g., "1-0022")
+    const cardIndex = deck.cards.findIndex(card => card.id === lastFlashcardId);
+    if (cardIndex !== -1) {
+      setCurrentIndex(cardIndex);
+    }
+  }, [deck]);
   
   if (!deck) {
     return (
@@ -61,13 +75,14 @@ const FlashcardDeckPage: React.FC = () => {
     setCurrentIndex(0);
   };
   
-  const handleCardViewed = async (cardId: string) => {
-    if (!isAuthenticated) {
+  const handleCardViewed = async () => {
+    if (!isAuthenticated || !id || !currentCard) {
       return;
     }
 
     try {
-      await updateLastFlashcard(cardId);
+      // Pass the card ID from the current card
+      await updateLastFlashcard(currentCard.id, id, currentIndex);
     } catch (error) {
       console.error('Failed to save progress:', error);
     }
@@ -157,7 +172,6 @@ const FlashcardDeckPage: React.FC = () => {
             <li>Say the words out loud to practice pronunciation</li>
             <li>Create your own example sentences with new vocabulary</li>
             <li>Try to recall the word before flipping the card</li>
-            <li>Mark cards as "mastered" once you consistently remember them</li>
           </ul>
         </div>
       </div>

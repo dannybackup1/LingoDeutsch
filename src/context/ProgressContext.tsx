@@ -1,12 +1,14 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import { useAuth } from './AuthContext';
 import { getApiBase } from '../services/config';
 
 interface ProgressContextType {
   lastLessonId: string | null;
   lastFlashcardId: string | null;
+  lastFlashcardDeckId: string | null;
+  lastFlashcardIndex: number | null;
   updateLastLesson: (lessonId: string) => Promise<void>;
-  updateLastFlashcard: (flashcardId: string) => Promise<void>;
+  updateLastFlashcard: (cardId: string, deckId: string, cardIndex: number) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -18,6 +20,11 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [lastFlashcardId, setLastFlashcardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const progressLoadedRef = useRef<string | null>(null);
+
+  // For backward compatibility with the old context interface
+  // We don't actually use these, but they're part of the exported context type
+  const lastFlashcardDeckId = null;
+  const lastFlashcardIndex = null;
 
   // Load progress from backend when user changes
   useEffect(() => {
@@ -87,10 +94,13 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [user?.id]);
 
-  const updateLastFlashcard = useCallback(async (flashcardId: string) => {
+  const updateLastFlashcard = useCallback(async (cardId: string, deckId: string, cardIndex: number) => {
     if (!user?.id) {
       throw new Error('User must be logged in to save progress');
     }
+
+    // Use cardId directly as flashcardId since it already contains deck info (format: "1-0022")
+    const flashcardId = cardId;
 
     // Optimistic update
     setLastFlashcardId(flashcardId);
@@ -118,6 +128,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       value={{
         lastLessonId,
         lastFlashcardId,
+        lastFlashcardDeckId,
+        lastFlashcardIndex,
         updateLastLesson,
         updateLastFlashcard,
         isLoading,

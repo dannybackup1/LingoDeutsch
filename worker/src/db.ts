@@ -88,7 +88,7 @@ CREATE TABLE IF NOT EXISTS __migrations (
 
 export async function bootstrap(env: Env) {
   const db = env.DB;
-  const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v3').first<{ value: string }>();
+  const seeded = await db.prepare('SELECT value FROM __migrations WHERE key = ?').bind('seeded_v4').first<{ value: string }>();
   if (seeded) return;
   
   const ddls = createTablesSQL
@@ -123,5 +123,5 @@ export async function bootstrap(env: Env) {
     await insertWord.bind(w.date, w.german, w.english, w.example).run();
   }
 
-  await db.prepare('INSERT OR REPLACE INTO __migrations (key, value) VALUES (?, ?)').bind('seeded_v3', new Date().toISOString()).run();
+  await db.prepare('INSERT OR REPLACE INTO __migrations (key, value) VALUES (?, ?)').bind('seeded_v4', new Date().toISOString()).run();
 }
