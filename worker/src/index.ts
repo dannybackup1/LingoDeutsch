@@ -103,8 +103,8 @@ function generateETag(data: string): string {
 function getCacheMaxAge(path: string): number {
   if (path === '/daily-word') return 600; // 10 分钟，动态内容
   if (path === '/daily-words') return 3600; // 1 小时
-  if (path.includes('/lessons') || path.includes('/flashcards')) return 86400; // 24 小时，静态内容
-  return 3600; // 默认 1 小���
+  if (path.includes('/lessons') || path.includes('/flashcards')) return 3600;
+  return 3600;
 }
 
 // ✅ JSON 响应统一带 CORS 和 Cache-Control
@@ -150,7 +150,6 @@ export default {
       const url = new URL(req.url);
       const path = url.pathname.replace(/\/$/, '');
 
-      // OPTIONS 预���请求
       if (req.method === 'OPTIONS') {
         return new Response(null, { headers: corsHeaders() });
       }

@@ -73,16 +73,14 @@ const HomePage: React.FC = () => {
               onClick={() => {
                 if (isAuthenticated && lastFlashcardDeckId && lastFlashcardIndex !== null) {
                   navigate(`/flashcards/${lastFlashcardDeckId}?cardIndex=${lastFlashcardIndex}`);
-                } else if (isAuthenticated && lastFlashcardId) {
-                  navigate('/flashcards');
                 } else {
-                  navigate('/daily-word');
+                  navigate('/flashcards');
                 }
               }}
               className="min-w-48 px-8 py-3 bg-transparent border-2 border-white text-white font-semibold
                         rounded-lg hover:bg-white/10 transition-colors duration-300"
             >
-              {isAuthenticated && lastFlashcardId ? 'Continue Flashcard' : 'Word of the Day'}
+              {isAuthenticated && lastFlashcardId ? 'Continue Flashcard' : 'Start Flashcard'}
             </button>
           </div>
         </div>
