@@ -10,8 +10,24 @@ import { useProgress } from '../context/ProgressContext';
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { lastLessonId, lastFlashcardId, lastFlashcardDeckId, lastFlashcardIndex } = useProgress();
+  const { lastLessonId, lastFlashcardId } = useProgress();
   const [dailyWord, setDailyWord] = useState<DailyWord | null>(null);
+
+  // Extract deck ID from card ID (e.g., "1-0022" -> "basics-1")
+  // Card IDs have format "deckNumber-cardNumber", we map back to "category-deckNumber"
+  const getLastDeckId = () => {
+    if (!lastFlashcardId) return null;
+    const cardIdParts = lastFlashcardId.split('-');
+    if (cardIdParts.length >= 2) {
+      const deckNumber = cardIdParts[0];
+      // For now, we assume all cards are in "basics" category decks
+      // In the future, this could be enhanced to look up the actual category
+      return `basics-${deckNumber}`;
+    }
+    return null;
+  };
+
+  const lastDeckId = getLastDeckId();
 
   useEffect(() => {
     fetchDailyWord().then(setDailyWord).catch(() => setDailyWord(null));
@@ -71,8 +87,8 @@ const HomePage: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                if (isAuthenticated && lastFlashcardDeckId && lastFlashcardIndex !== null) {
-                  navigate(`/flashcards/${lastFlashcardDeckId}?cardIndex=${lastFlashcardIndex}`);
+                if (isAuthenticated && lastDeckId) {
+                  navigate(`/flashcards/${lastDeckId}`);
                 } else {
                   navigate('/flashcards');
                 }
