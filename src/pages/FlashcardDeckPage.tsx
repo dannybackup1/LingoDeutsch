@@ -11,19 +11,10 @@ const FlashcardDeckPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
-  const { updateLastFlashcard, lastFlashcardId, lastFlashcardDeckId } = useProgress();
+  const { updateLastFlashcard, lastFlashcardId } = useProgress();
 
   const [deck, setDeck] = useState<FlashcardDeck | undefined>(undefined);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Helper function to parse flashcardId format "deckId-cardId"
-  const parseFlashcardId = (flashcardId: string) => {
-    const parts = flashcardId.split('-');
-    if (parts.length === 2) {
-      return { deckId: parts[0], cardId: parts[1] };
-    }
-    return null;
-  };
 
   useEffect(() => {
     if (!id) return;
