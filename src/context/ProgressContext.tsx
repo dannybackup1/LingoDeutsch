@@ -55,8 +55,6 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       if (!user?.id) {
         setLastLessonId(null);
         setLastFlashcardId(null);
-        setLastFlashcardDeckId(null);
-        setLastFlashcardIndex(null);
         progressLoadedRef.current = null;
         return;
       }
@@ -74,36 +72,16 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           const data = await response.json();
           setLastLessonId(data.lastLessonId || null);
           setLastFlashcardId(data.lastFlashcardId || null);
-
-          // Load flashcard deck and index from localStorage
-          const deckData = localStorage.getItem('lastFlashcardDeckData');
-          if (deckData) {
-            try {
-              const { deckId, cardIndex } = JSON.parse(deckData);
-              setLastFlashcardDeckId(deckId || null);
-              setLastFlashcardIndex(cardIndex ?? null);
-            } catch (err) {
-              setLastFlashcardDeckId(null);
-              setLastFlashcardIndex(null);
-            }
-          } else {
-            setLastFlashcardDeckId(null);
-            setLastFlashcardIndex(null);
-          }
           progressLoadedRef.current = user.id;
         } else {
           setLastLessonId(null);
           setLastFlashcardId(null);
-          setLastFlashcardDeckId(null);
-          setLastFlashcardIndex(null);
           progressLoadedRef.current = user.id;
         }
       } catch (error) {
         console.error('Failed to load progress:', error);
         setLastLessonId(null);
         setLastFlashcardId(null);
-        setLastFlashcardDeckId(null);
-        setLastFlashcardIndex(null);
         progressLoadedRef.current = user.id;
       } finally {
         setIsLoading(false);
