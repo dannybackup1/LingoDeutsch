@@ -122,8 +122,8 @@ export const ProgressProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       throw new Error('User must be logged in to save progress');
     }
 
-    // Create flashcardId in format "deckId-cardId"
-    const flashcardId = `${deckId}-${cardId}`;
+    // Use cardId directly as flashcardId since it already contains deck info (format: "1-0022")
+    const flashcardId = cardId;
 
     // Optimistic update
     setLastFlashcardId(flashcardId);
